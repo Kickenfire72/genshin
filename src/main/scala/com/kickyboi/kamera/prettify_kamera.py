@@ -3,7 +3,7 @@ import json
 limited_5_stars = ["Venti", "Klee", "Tartaglia", "Zhongli", "Albedo", "Ganyu", "Xiao", "HuTao", "Eula", "KaedeharaKazuha", "KamisatoAyaka", "Yoimiya", "RaidenShogun", "SangonomiyaKokomi",
                    "AratakiItto", "Shenhe", "YaeMiko", "KamisatoAyato", "Yelan", "Cyno", "Nilou", "Nahida", "Wanderer", "Alhaitham", "Baizhu", "Lyney", "Neuvillette", "Wriotheslay", "Furina", "Navia",
                    "Xianyun", "Chiori", "Arlecchino", "Clorinde", "Sigewinne", "Emilie", "Mualani", "Kinich", "Xilonen", "Chasca", "Citlali", "Mavuika", "Varesa", "Escoffier", "Skirk", "Ineffa"]
-standard_5_stars = ["Aloy", "Jean", "Diluc", "Qiqi", "Mona", "Keqing", "Tighnari", "Dehya", "Mizuki"]
+standard_5_stars = ["Aloy", "Jean", "Diluc", "Qiqi", "Mona", "Keqing", "Tighnari", "Dehya", "YumemizukiMizuki"]
 
 category_order_map = {}
 for name in limited_5_stars:
@@ -29,12 +29,6 @@ sorting_map = {
 
 with open('input.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
-
-"""
-max_character_name_length = 17
-max_weapon_name_length = 31
-max_artifact_set_name_length = 34
-"""
 
 max_character_name_length = max(len(character["key"]) for character in data["characters"])
 max_weapon_name_length = max(len(weapon["key"]) for weapon in data["weapons"])
@@ -100,8 +94,8 @@ def format_artifact(artifact):
     location = "\"" + artifact['location'] + "\""
     lock = "true" if artifact["lock"] else "false"
     id = artifact['id']
-    #substats = ', '.join([format_sub(sub) for sub in sorted(artifact['substats'], key=lambda x: sub_order.get(x['key'], float('inf')))])
-    substats = ', '.join([format_sub(sub) for sub in artifact['substats']])
+    substats = ', '.join([format_sub(sub) for sub in sorted(artifact['substats'], key=lambda x: sub_order.get(x['key'], float('inf')))])
+    #substats = ', '.join([format_sub(sub) for sub in artifact['substats']])
 
     return (
         f"{{ "
