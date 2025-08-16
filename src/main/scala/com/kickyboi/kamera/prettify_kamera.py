@@ -1,3 +1,10 @@
+"""
+        NOTES
+  You can choose between default and custom section order and sorting at lines 45 and 48
+Default will keep the kamera output json as is, and only prettify it
+Custom redefines them as described in the code
+
+"""
 import json
 
 limited_5_stars = ["Venti", "Klee", "Tartaglia", "Zhongli", "Albedo", "Ganyu", "Xiao", "HuTao", "Eula", "KaedeharaKazuha", "KamisatoAyaka", "Yoimiya", "RaidenShogun", "SangonomiyaKokomi",
