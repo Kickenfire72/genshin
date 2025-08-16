@@ -27,6 +27,19 @@ sorting_map = {
     "substats": lambda x: sub_order.get(x['key'], float('inf'))
 }
 
+#custom_sorting_map = {topic: (lambda y         : sorted(y, key=sorting_map[topic])) for topic in sorting_map} // doesn't work for funny python reasons
+custom_sorting_map = {topic: (lambda y, t=topic: sorted(y, key=sorting_map[t])) for topic in sorting_map}
+default_sorting_map = {key: lambda x: x for key in custom_sorting_map}
+
+custom_section_order = ["characters", "weapons", "artifacts"]
+default_section_order = ["weapons", "artifacts", "characters"]
+
+# default_sorting_map or custom_sorting_map
+used_sorting_map = custom_sorting_map
+
+# default_section_order or custom_section_order
+used_section_order = custom_section_order
+
 with open('input.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
 
@@ -50,12 +63,12 @@ def format_character(character):
         f"\"key\": {key:<{max_character_name_length + 2}}, "
         f"\"level\": {level:>2}, "
         f"\"constellation\": {const}, "
+        f"\"ascension\": {asc}, "
         f"\"talent\": {{ "
         f"\"auto\": {auto:>2}, "
         f"\"skill\": {skill:>2}, "
         f"\"burst\": {burst:>2} "
-        f"}}, "
-        f"\"ascension\": {asc} "
+        f"}} "
         f"}}"
     )
 
@@ -94,15 +107,14 @@ def format_artifact(artifact):
     location = "\"" + artifact['location'] + "\""
     lock = "true" if artifact["lock"] else "false"
     id = artifact['id']
-    substats = ', '.join([format_sub(sub) for sub in sorted(artifact['substats'], key=lambda x: sub_order.get(x['key'], float('inf')))])
-    #substats = ', '.join([format_sub(sub) for sub in artifact['substats']])
+    substats = ', '.join([format_sub(sub) for sub in used_sorting_map["substats"](artifact['substats'])])
 
     return (
         f"{{ "
         f"\"setKey\": {setKey:<{max_artifact_set_name_length + 2}}, "
         f"\"slotKey\": {slotKey:<9}, "
-        f"\"mainStatKey\": {mainStatKey:<15}, "
         f"\"rarity\": {rarity}, "
+        f"\"mainStatKey\": {mainStatKey:<15}, "
         f"\"level\": {level:>2}, "
         f"\"substats\": [ {substats:<154} ], "
         f"\"location\": {location:<{max_character_name_length + 2}}, "
@@ -118,7 +130,7 @@ handler_map = {
 }
 
 def output_section(section):
-    data[section] = sorted(data[section], key=sorting_map[section])
+    data[section] = used_sorting_map[section](data[section])
     return "  \"" + section + "\": [\n" + ',\n'.join(["    " + handler_map[section](item) for item in data[section]]) + '\n' + "  ]"
 
 with open('output.json', 'w') as file:
@@ -130,7 +142,7 @@ with open('output.json', 'w') as file:
         f"  \"source\": \"{data['source']}\",\n"
     )
 
-    sections = list(filter(lambda section: section in data, ["characters", "weapons", "artifacts"]))
+    sections = list(filter(lambda section: section in data, used_section_order))
     file.write(',\n'.join([output_section(section) for section in sections]))
 
     file.write(f"\n}}\n")
