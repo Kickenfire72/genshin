@@ -25,6 +25,11 @@
       <artifactId>joda-time</artifactId>
       <version>2.12.7</version>
     </dependency>
+    <dependency>
+      <groupId>org.typelevel</groupId>
+      <artifactId>spire_2.13</artifactId>
+      <version>0.18.0</version>
+    </dependency>
   </dependencies>
 
   <build>

@@ -1,9 +1,9 @@
-package com.kickyboi
+package com.kickyboi.misc
 
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
 
-object Utility {
+object Utils {
   def formatFancyDate(date: LocalDate): String =
     s"${dayWithSuffix(date.getDayOfMonth)} of ${DateTimeFormat.forPattern("MMMM").print(date)}"
 
