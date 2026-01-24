@@ -12,12 +12,12 @@ import scala.util.Random
 object Genshin extends App {
   private val patch50 = LocalDate.parse("2024-08-28")
 
-  var date = LocalDate.parse("2025-04-12")
+  var date = LocalDate.parse("2026-01-24")
 
-  var keys = 0
-  var chars = 1
+  var keys = 4
+  var chars = 0
 
-  while (keys <= 4) {
+  while (keys <= 6) {
     date = date.plusDays(1)
     if (isOddPatchDay(date)) {
       chars += 2
@@ -31,7 +31,7 @@ object Genshin extends App {
     }
     if (isFirstOfMonth(date)) {
       keys += 2
-      println(s"($keys keys) ($chars echoes) 1st of ${DateTimeFormat.forPattern("MMMM").print(date)}, new theater drops")
+      println(s"($keys keys) ($chars echoes) 1st of ${DateTimeFormat.forPattern("MMMM").print(date)} ${date.getYear}, new theater drops")
     }
     if (keys >= 2 && chars > 0) {
       val buys = math.min(keys / 2, chars)
