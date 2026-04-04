@@ -30,39 +30,42 @@ moraBaseDay = moraDailyComms + moraExpeditions
 moraBaseMonday = 2*moraWeeklyBosses
 moraBaseArtifactDay = moraBaseDay + moraDayArtifacts
 
+monthlyPrimos = 800
+
 function loginPrimos(dayNb) {
-  if (dayNb == 4) { return 20 };
-  if (dayNb == 11) { return 20 };
-  if (dayNb == 18) { return 20 };
+  if (dayNb == 4-1) { return 20 };
+  if (dayNb == 11-1) { return 20 };
+  if (dayNb == 18-1) { return 20 };
 
   return 0;
 }
 
 function loginMora(dayNb) {
-  if (dayNb == 3) { return 5 };
-  if (dayNb == 7) { return 8 };
-  if (dayNb == 10) { return 5 };
-  if (dayNb == 14) { return 8 };
-  if (dayNb == 17) { return 5 };
-  if (dayNb == 21) { return 8 };
-  if (dayNb == 24) { return 5 };
-  if (dayNb == 29) { return 5 };
-  if (dayNb == 30) { return 5 };
+  if (dayNb == 3-1) { return 5 };
+  if (dayNb == 7-1) { return 8 };
+  if (dayNb == 10-1) { return 5 };
+  if (dayNb == 14-1) { return 8 };
+  if (dayNb == 17-1) { return 5 };
+  if (dayNb == 21-1) { return 8 };
+  if (dayNb == 24-1) { return 5 };
+  if (dayNb == 29-1) { return 5 };
+  if (dayNb == 30-1) { return 5 };
 
   return 0;
 }
 
 function loginExp(dayNb) {
-  if (dayNb == 1) { return 0.75 };
-  if (dayNb == 6) { return 0.5 };
-  if (dayNb == 8) { return 0.75 };
-  if (dayNb == 13) { return 0.5 };
-  if (dayNb == 15) { return 0.75 };
-  if (dayNb == 20) { return 0.5 };
-  if (dayNb == 12) { return 1.25 };
-  if (dayNb == 25) { return 3 };
-  if (dayNb == 27) { return 0.75 };
-  if (dayNb == 28) { return 3 };
+  if (dayNb == 1) { return 0.75 }; // wrong
+  if (dayNb == 6-1) { return 0.5 };
+  if (dayNb == 8-1) { return 0.75 };
+  if (dayNb == 13-1) { return 0.5 };
+  if (dayNb == 15-1) { return 0.75 };
+  if (dayNb == 20-1) { return 0.5 };
+  if (dayNb == 12-1) { return 1.25 };
+  if (dayNb == 25-1) { return 3 };
+  if (dayNb == 27-1) { return 0.75 };
+  if (dayNb == 28-1) { return 3 };
+
 
   return 0;
 }
@@ -73,7 +76,7 @@ function addPrimosToday(date) {
 
   midsum += dayPrimos;
   midsum += loginPrimos(dayNb)
-  if (dayNb == 1) { midsum += theaterPrimos; };
+  if (dayNb == 1) { midsum += theaterPrimos + monthlyPrimos; };
   if (dayNb == 16) { midsum += abyssPrimos; }
 
   return midsum
@@ -214,6 +217,15 @@ function sumOverMap(map, a, b) {
 
 function GETBPMORA(a, b) { return sumOverMap(bpMora, a, b) }
 function GETBPEXP(a, b) { return sumOverMap(bpExp, a, b) }
-function TMATS(a, b) { return sumOverMap(tMats, a, b) }
-function TBOOKS(a, b) { return sumOverMap(tBooks, a, b) }
+function TMATS(a, b) { return sumOverMap(tMats, a, b)/9 }
+function TBOOKS(a, b) { return sumOverMap(tBooks, a, b)/9 }
 function TMORA(a, b) { return sumOverMap(tMora, a, b)/1000 }
+
+
+//console.log(TBOOKS(1, 8))
+
+
+
+
+
+

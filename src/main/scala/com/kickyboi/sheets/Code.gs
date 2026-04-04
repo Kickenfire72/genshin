@@ -1,5 +1,7 @@
 // MAKERS
 
+function SILENCER() {}
+
 function PRIMER(goalDate) { return MAKER(goalDate, addPrimosToday) }
 function MORAER(goalDate) { return MAKER(goalDate, addMoraToday) / 1000 }
 function EXPER(goalDate) { return MAKER(goalDate, addExpToday) }
@@ -8,15 +10,16 @@ function MAKER(goalDate, makerFunction) {
   var sum = 0
 
   var today = new Date()
-  today.setDate(today.getDate() + 1)
+  today.setDate(today.getDate())
+  today.setHours(12, 0, 0, 0)
+
+  var tomorrow = new Date()
+  tomorrow.setDate(today.getDate() + 1)
 
   var goal = new Date(goalDate)
-  //goal.setHours(0, 0, 0, 0);
-  //Logger.log(goal)
-  goal.setDate(goal.getDate() + 1)
+  goal.setDate(goal.getDate())
 
   for (var date = today; date <= goal; date.setDate(date.getDate() + 1)) {
-    Logger.log(date)
     sum += makerFunction(date)
   }
 
@@ -27,7 +30,7 @@ function BADDER(bossDays, talentDays, curMora, curExp, goalMora, goalExp, resin,
   counter = 0
 
   var start = new Date()
-  start.setHours(0, 0, 0, 0);
+  start.setHours(12, 0, 0, 0)
 
   spDaysMora = (bossDays*moraDayBosses - talentDays*moraDayTalents)/1000
   do {
@@ -42,3 +45,9 @@ function BADDER(bossDays, talentDays, curMora, curExp, goalMora, goalExp, resin,
 
   return STRINGDATE(start)
 }
+
+
+//console.log(BADDER(0, 0, 0, 0, 2, 0, 0))
+//console.log(PRIMER("2026-03-31"))
+//console.log(addPrimosToday("2026-03-31"))
+

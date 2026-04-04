@@ -17,7 +17,7 @@ object Genshin extends App {
   var keys = 4
   var chars = 0
 
-  while (keys <= 6) {
+  while (keys <= 8) {
     date = date.plusDays(1)
     if (isOddPatchDay(date)) {
       chars += 2
@@ -58,7 +58,7 @@ object Patch extends App {
     date = date.plusDays(1)
     if (isPatchDay(date)) {
       num += 1
-      if (num > 5) println(s"patch ${(num / 9) + 5}.${num % 9}: $date")
+      if (num > 12) println(s"patch ${(num / 9) + 5}.${num % 9}: $date")
     }
   }
 
@@ -203,6 +203,7 @@ object CoinFlipOddsPretty extends App {
       for (value <- row) {
         print(f"${truncate(value.toDouble * 100, 1)}%7.1f")
       }
+      println()
     }
   }
 

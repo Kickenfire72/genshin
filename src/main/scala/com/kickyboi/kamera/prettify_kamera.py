@@ -1,15 +1,19 @@
 """
         NOTES
-  You can choose between default and custom section order and sorting at lines 45 and 48
+  You can choose between default and custom section order and sorting at lines 49 and 52
 Default will keep the kamera output json as is, and only prettify it
 Custom redefines them as described in the code
 
 """
 import json
 
-limited_5_stars = ["Venti", "Klee", "Tartaglia", "Zhongli", "Albedo", "Ganyu", "Xiao", "HuTao", "Eula", "KaedeharaKazuha", "KamisatoAyaka", "Yoimiya", "RaidenShogun", "SangonomiyaKokomi",
-                   "AratakiItto", "Shenhe", "YaeMiko", "KamisatoAyato", "Yelan", "Cyno", "Nilou", "Nahida", "Wanderer", "Alhaitham", "Baizhu", "Lyney", "Neuvillette", "Wriotheslay", "Furina", "Navia",
-                   "Xianyun", "Chiori", "Arlecchino", "Clorinde", "Sigewinne", "Emilie", "Mualani", "Kinich", "Xilonen", "Chasca", "Citlali", "Mavuika", "Varesa", "Escoffier", "Skirk", "Ineffa"]
+limited_5_stars = ["Venti", "Klee", "Tartaglia", "Zhongli", "Albedo", "Ganyu", "Xiao", "HuTao", "Eula", "KaedeharaKazuha",
+                   "KamisatoAyaka", "Yoimiya", "RaidenShogun", "SangonomiyaKokomi", "AratakiItto", "Shenhe", "YaeMiko", "KamisatoAyato", "Yelan",
+                   "Cyno", "Nilou", "Nahida", "Wanderer", "Alhaitham", "Baizhu",
+                   "Lyney", "Neuvillette", "Wriotheslay", "Furina", "Navia", "Xianyun", "Chiori", "Arlecchino", "Clorinde", "Sigewinne", "Emilie",
+                   "Mualani", "Kinich", "Xilonen", "Chasca", "Citlali", "Mavuika", "Varesa", "Escoffier", "Skirk", "Ineffa",
+                   "Lauma", "Flins", "Nefer", "Durin", "Columbina", "Zibai"
+                   ]
 standard_5_stars = ["Aloy", "Jean", "Diluc", "Qiqi", "Mona", "Keqing", "Tighnari", "Dehya", "YumemizukiMizuki"]
 
 category_order_map = {}

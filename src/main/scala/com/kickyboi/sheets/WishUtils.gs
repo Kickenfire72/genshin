@@ -94,14 +94,13 @@ var odds = [
 function oddsum(a, b) {
   copy = odds.slice()
   total = copy.splice(a-1, b-1).reduce((a, b) => a + b, 0)
-  console.log("a", total)
 
   return 0;
 }
 
 function show() {
   total = odds.reduce((a, b) => a + b, 0)
-console.log(total)
 
   return 0;
 }
+
