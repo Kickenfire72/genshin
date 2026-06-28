@@ -72,7 +72,7 @@ def format_character(character):
     return (
         f"{{ "
         f"\"key\": {key:<{max_character_name_length + 2}}, "
-        f"\"level\": {level:>2}, "
+        f"\"level\": {level:>3}, "
         f"\"constellation\": {const}, "
         f"\"ascension\": {asc}, "
         f"\"talent\": {{ "
