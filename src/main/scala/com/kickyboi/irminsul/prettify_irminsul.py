@@ -1,7 +1,7 @@
 """
         NOTES
   You can choose between default and custom section order and sorting at lines 49 and 52
-Default will keep the kamera output json as is, and only prettify it
+Default will keep the Irminsul output json as is, and only prettify it
 Custom redefines them as described in the code
 
 """
@@ -90,7 +90,6 @@ def format_weapon(weapon):
     refinement = weapon['refinement']
     location = "\"" + weapon['location'] + "\""
     lock = "true" if weapon["lock"] else "false"
-    id = weapon['id']
 
     return (
         f"{{ "
@@ -99,8 +98,7 @@ def format_weapon(weapon):
         f"\"ascension\": {ascension}, "
         f"\"refinement\": {refinement}, "
         f"\"location\": {location:<{max_character_name_length + 2}}, "
-        f"\"lock\": {lock:<5}, "
-        f"\"id\": {id:>4}"
+        f"\"lock\": {lock:<5}"
         f" }}"
     )
 
@@ -117,7 +115,6 @@ def format_artifact(artifact):
     rarity = artifact['rarity']
     location = "\"" + artifact['location'] + "\""
     lock = "true" if artifact["lock"] else "false"
-    id = artifact['id']
     substats = ', '.join([format_sub(sub) for sub in used_sorting_map["substats"](artifact['substats'])])
 
     return (
@@ -129,8 +126,7 @@ def format_artifact(artifact):
         f"\"level\": {level:>2}, "
         f"\"substats\": [ {substats:<154} ], "
         f"\"location\": {location:<{max_character_name_length + 2}}, "
-        f"\"lock\": {lock:<5}, "
-        f"\"id\": {id:>4}"
+        f"\"lock\": {lock:<5}"
         f" }}"
     )
 
@@ -149,7 +145,6 @@ with open('output.json', 'w') as file:
         f"{{\n"
         f"  \"format\": \"{data['format']}\",\n"
         f"  \"version\": {data['version']},\n"
-        f"  \"kamera_version\": \"{data['kamera_version']}\",\n"
         f"  \"source\": \"{data['source']}\",\n"
     )
 
