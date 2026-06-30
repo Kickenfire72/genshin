@@ -7,6 +7,31 @@ limited_5_stars = ["Venti", "Klee", "Tartaglia", "Zhongli", "Albedo", "Ganyu", "
                    ]
 standard_5_stars = ["Aloy", "Jean", "Diluc", "Qiqi", "Mona", "Keqing", "Tighnari", "Dehya", "YumemizukiMizuki"]
 
+artifact_sets_5 = ["Instructor", "TheExile",
+                   "GladiatorsFinale", "WanderersTroupe",
+                   "NoblesseOblige", "BloodstainedChivalry",
+                   "CrimsonWitchOfFlames", "Lavawalker",
+                   "ThunderingFury", "Thundersoother",
+                   "ViridescentVenerer", "MaidenBeloved",
+                   "ArchaicPetra", "RetracingBolide",
+                   "BlizzardStrayer", "HeartOfDepth",
+                   "TenacityOfTheMillelith", "PaleFlame",
+                   "ShimenawasReminiscence", "EmblemOfSeveredFate",
+                   "HuskOfOpulentDreams", "OceanHuedClam",
+                   "VermillionHereafter", "EchoesOfAnOffering",
+                   "DeepwoodMemories", "GildedDreams",
+                   "DesertPavilionChronicle", "FlowerOfParadiseLost",
+                   "NymphsDream", "VourukashasGlow",
+                   "MarechausseeHunter", "GoldenTroupe",
+                   "SongOfDaysPast", "NighttimeWhispersInTheEchoingWoods",
+                   "FragmentOfHarmonicWhimsy", "UnfinishedReverie",
+                   "ScrollOfTheHeroOfCinderCity", "ObsidianCodex",
+                   "LongNightsOath", "FinaleOfTheDeepGalleries",
+                   "NightOfTheSkysUnveiling", "SilkenMoonsSerenade",
+                   "AubadeOfMorningstarAndMoon", "ADayCarvedFromRisingWinds",
+                   "CelestialGift", "DisenchantmentInDeepShadow"
+                   ]
+
 category_order_map = {}
 for name in limited_5_stars:
     category_order_map[name] = 0
