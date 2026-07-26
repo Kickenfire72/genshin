@@ -9,15 +9,15 @@
   <version>1.0</version>
 
   <properties>
-    <scala.version>2.13.12</scala.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <scala.version>3.8.4</scala.version>
+    <maven.compiler.source>1.21</maven.compiler.source>
+    <maven.compiler.target>1.21</maven.compiler.target>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
+      <artifactId>scala3-library_3</artifactId>
       <version>${scala.version}</version>
     </dependency>
     <dependency>
@@ -27,7 +27,7 @@
     </dependency>
     <dependency>
       <groupId>org.typelevel</groupId>
-      <artifactId>spire_2.13</artifactId>
+      <artifactId>spire_3</artifactId>
       <version>0.18.0</version>
     </dependency>
   </dependencies>
