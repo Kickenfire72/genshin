@@ -3,7 +3,6 @@ package com.kickyboi.formula
 import com.kickyboi.formula.Element.*
 import com.kickyboi.formula.ScalingType.*
 import com.kickyboi.formula.MotionType.*
-
 import com.kickyboi.formula.WeaponType.*
 
 enum WeaponType:
@@ -41,55 +40,92 @@ case class Weapon(name: String, weaponType: WeaponType, baseATK: Int,
                   hpPct: Option[Double], atkPct: Option[Double], defPct: Option[Double],
                   em: Option[Int], cr: Option[Double], cd: Option[Double])
 
-case class CombatMotion(time: Double, motion: Motion) {
-  def calcDamage(character: Character, combatBuffs: Seq[CombatBuff]): Double =
-    val applyingBuffs = combatBuffs.filter(_.period.contains(time))
-    val scalingValue = motion.scalings.map(calcScalingDamage(_, character, applyingBuffs)).sum
-    val damageBonus: Double = motion.`type` match
-      case Normal | Charged | Plunge | Skill | Burst =>
-        val typeDmgBonus = motion.`type` match
-          case Normal => applyingBuffs.flatMap(_.buff.normalDmgBonus).sum / 100
-          case Charged => applyingBuffs.flatMap(_.buff.chargeDmgBonus).sum / 100
-          case Plunge => applyingBuffs.flatMap(_.buff.plungeDmgBonus).sum / 100
-          case Skill => applyingBuffs.flatMap(_.buff.skillDmgBonus).sum / 100
-          case Burst => applyingBuffs.flatMap(_.buff.burstDmgBonus).sum / 100
-        val elementDmgBonus = motion.element match
-          case Pyro => applyingBuffs.flatMap(_.buff.pyroDmgBonus).sum / 100
-          case Hydro => applyingBuffs.flatMap(_.buff.hydroDmgBonus).sum / 100
-          case Electro => applyingBuffs.flatMap(_.buff.electroDmgBonus).sum / 100
-          case Cryo => applyingBuffs.flatMap(_.buff.cryoDmgBonus).sum / 100
-          case Anemo => applyingBuffs.flatMap(_.buff.anemoDmgBonus).sum / 100
-          case Geo => applyingBuffs.flatMap(_.buff.geoDmgBonus).sum / 100
-          case Dendro => applyingBuffs.flatMap(_.buff.dendroDmgBonus).sum / 100
-          case Physical => applyingBuffs.flatMap(_.buff.physicalDmgBonus).sum / 100
-        typeDmgBonus + elementDmgBonus
-      case LunarEC => applyingBuffs.flatMap(_.buff.lunarECDmgBonus).sum / 100
-      case LunarBloom => applyingBuffs.flatMap(_.buff.lunarBloomDmgBonus).sum / 100
-      case LunarCR => applyingBuffs.flatMap(_.buff.lunarCRDmgBonus).sum / 100
-      case StellarSC => applyingBuffs.flatMap(_.buff.stellarSCDmgBonus).sum / 100
-      case StellarSW => applyingBuffs.flatMap(_.buff.stellarSWDmgBonus).sum / 100
-    1 + damageBonus / 100
-
-  private def calcScalingDamage(scaling: Scaling, character: Character, applyingBuffs: Seq[CombatBuff]): Double =
-    scaling match
-      case Hp => character.baseHP * (1 + applyingBuffs.flatMap(_.buff.hpPct).sum / 100) + applyingBuffs.flatMap(_.buff.flatHp).sum
-      case Atk => character.baseATK * (1 + applyingBuffs.flatMap(_.buff.atkPct).sum / 100) + applyingBuffs.flatMap(_.buff.flatAtk).sum
-      case Def => character.baseHP * (1 + applyingBuffs.flatMap(_.buff.defPct).sum / 100) + applyingBuffs.flatMap(_.buff.flatDef).sum
-      case Em => character.baseEM + applyingBuffs.flatMap(_.buff.em).sum
-}
-case class CharacterCombatMotions(character: Character, combatMotions: Seq[CombatMotion])
-
 case class Buff(flatHp: Option[Int] = None, flatAtk: Option[Int] = None, flatDef: Option[Int] = None,
                 hpPct: Option[Double] = None, atkPct: Option[Double] = None, defPct: Option[Double] = None,
                 em: Option[Int] = None, cr: Option[Double] = None, cd: Option[Double] = None,
                 normalDmgBonus: Option[Double] = None, chargeDmgBonus: Option[Double] = None, plungeDmgBonus: Option[Double] = None, skillDmgBonus: Option[Double] = None, burstDmgBonus: Option[Double] = None,
                 pyroDmgBonus: Option[Double] = None, hydroDmgBonus: Option[Double] = None, electroDmgBonus: Option[Double] = None, cryoDmgBonus: Option[Double] = None, anemoDmgBonus: Option[Double] = None, geoDmgBonus: Option[Double] = None, dendroDmgBonus: Option[Double] = None, physicalDmgBonus: Option[Double] = None,
-                lunarECDmgBonus: Option[Double] = None, lunarBloomDmgBonus: Option[Double] = None, lunarCRDmgBonus: Option[Double] = None, stellarSCDmgBonus: Option[Double] = None, stellarSWDmgBonus: Option[Double] = None)
+                lunarECDmgBonus: Option[Double] = None, lunarBloomDmgBonus: Option[Double] = None, lunarCRDmgBonus: Option[Double] = None, stellarSCDmgBonus: Option[Double] = None, stellarSWDmgBonus: Option[Double] = None,
+                lunarECBaseIncrease: Option[Int] = None, lunarBloomBaseIncrease: Option[Int] = None, lunarCRBaseIncrease: Option[Int] = None, stellarSCBaseIncrease: Option[Int] = None, stellarSWBaseIncrease: Option[Int] = None,
+                stellarSCStacks: Option[Int] = None, stellarSWLevel: Option[Int] = None,
+                lunarECElevation: Option[Double] = None, lunarBloomElevation: Option[Double] = None, lunarCRElevation: Option[Double] = None, stellarSCElevation: Option[Double] = None, stellarSWElevation: Option[Double] = None)
 
 case class Period(startTime: Double, endTime: Double) {
   def contains(time: Double): Boolean = (startTime <= time) && (endTime >= time)
 }
 case class CombatBuff(period: Period, buff: Buff)
+
+case class CombatMotion(time: Double, motion: Motion) {
+  def calcDamage(character: Character, combatBuffs: Seq[CombatBuff]): Double =
+    val applyingBuffs = combatBuffs.filter(_.period.contains(time)).map(_.buff)
+
+    val totalHp = character.baseHP * (1 + applyingBuffs.flatMap(_.hpPct).sum / 100) + applyingBuffs.flatMap(_.flatHp).sum
+    val totalAtk = character.baseATK * (1 + applyingBuffs.flatMap(_.atkPct).sum / 100) + applyingBuffs.flatMap(_.flatAtk).sum
+    val totalDef = character.baseHP * (1 + applyingBuffs.flatMap(_.defPct).sum / 100) + applyingBuffs.flatMap(_.flatDef).sum
+    val totalEm = character.baseEM + applyingBuffs.flatMap(_.em).sum
+
+    val scalingTotal = motion.scalings.map{ scaling =>
+      val scalingValue: Double = scaling.`type` match
+        case Hp => totalHp
+        case Atk => totalAtk
+        case Def => totalDef
+        case Em => totalEm
+      scalingValue * scaling.values(8)
+    }.sum
+
+    val elementalDmgBonus = motion.element match
+      case Pyro => applyingBuffs.flatMap(_.pyroDmgBonus).sum
+      case Hydro => applyingBuffs.flatMap(_.hydroDmgBonus).sum
+      case Electro => applyingBuffs.flatMap(_.electroDmgBonus).sum
+      case Cryo => applyingBuffs.flatMap(_.cryoDmgBonus).sum
+      case Anemo => applyingBuffs.flatMap(_.anemoDmgBonus).sum
+      case Geo => applyingBuffs.flatMap(_.geoDmgBonus).sum
+      case Dendro => applyingBuffs.flatMap(_.dendroDmgBonus).sum
+      case Physical => applyingBuffs.flatMap(_.physicalDmgBonus).sum
+
+    val damageBonus: Double = motion.`type` match
+      case Normal => applyingBuffs.flatMap(_.normalDmgBonus).sum + elementalDmgBonus
+      case Charged => applyingBuffs.flatMap(_.chargeDmgBonus).sum + elementalDmgBonus
+      case Plunge => applyingBuffs.flatMap(_.plungeDmgBonus).sum + elementalDmgBonus
+      case Skill => applyingBuffs.flatMap(_.skillDmgBonus).sum + elementalDmgBonus
+      case Burst => applyingBuffs.flatMap(_.burstDmgBonus).sum + elementalDmgBonus
+      case LunarEC => applyingBuffs.flatMap(_.lunarECDmgBonus).sum + getEmMultiplier(Reaction.LunarEC, totalEm)
+      case LunarBloom => applyingBuffs.flatMap(_.lunarBloomDmgBonus).sum + getEmMultiplier(Reaction.LunarBloom, totalEm)
+      case LunarCR => applyingBuffs.flatMap(_.lunarCRDmgBonus).sum + getEmMultiplier(Reaction.LunarCR, totalEm)
+      case StellarSC => applyingBuffs.flatMap(_.stellarSCDmgBonus).sum + getEmMultiplier(Reaction.StellarSC, totalEm)
+      case StellarSW => applyingBuffs.flatMap(_.stellarSWDmgBonus).sum + getEmMultiplier(Reaction.StellarSW, totalEm)
+
+    val baseIncrease: Int = motion.`type` match
+      case LunarEC => applyingBuffs.flatMap(_.lunarECBaseIncrease).sum
+      case LunarBloom => applyingBuffs.flatMap(_.lunarBloomBaseIncrease).sum
+      case LunarCR => applyingBuffs.flatMap(_.lunarCRBaseIncrease).sum
+      case StellarSC => applyingBuffs.flatMap(_.stellarSCBaseIncrease).sum
+      case StellarSW => applyingBuffs.flatMap(_.stellarSWBaseIncrease).sum
+      case _ => 0
+
+    val stellarSCStacks = applyingBuffs.flatMap(_.stellarSCStacks).sum
+    val baseMultiplier: Double = motion.`type` match
+      case LunarEC => 3
+      case LunarCR => 1.6
+      case StellarSC => if stellarSCStacks == 0 then 1 else 1.4 + stellarSCStacks * 0.05
+      case _ => 1
+    val elevation: Double = motion.`type` match
+      case LunarEC => applyingBuffs.flatMap(_.lunarECElevation).sum
+      case LunarBloom => applyingBuffs.flatMap(_.lunarBloomElevation).sum
+      case LunarCR => applyingBuffs.flatMap(_.lunarCRElevation).sum
+      case StellarSC => applyingBuffs.flatMap(_.stellarSCElevation).sum
+      case StellarSW => applyingBuffs.flatMap(_.stellarSWElevation).sum
+      case _ => 0
+
+    val cr = character.baseCR + applyingBuffs.flatMap(_.cr).sum
+    val cd = character.baseCR + applyingBuffs.flatMap(_.cd).sum
+    val critMultiplier = 1 + Math.min(100, cr) * cd
+
+    (baseMultiplier * scalingTotal * (1+baseIncrease/100) * (1+damageBonus/100) + 0) // additive
+      * critMultiplier * (1+elevation/100)
+
+}
+case class CharacterCombatMotions(character: Character, combatMotions: Seq[CombatMotion])
 
 object Formula {
   @main def main(): Unit =
