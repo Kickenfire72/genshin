@@ -29,6 +29,8 @@ def getEmMultiplier(reaction: Reaction, em: Int): Double =
 
 
 case class Scaling(`type`: ScalingType, values: Seq[Double])
+case class MotionModifiers(quill: Int = 0, isMelt: Boolean = false, isVape: Boolean = false, isSpread: Boolean = false, isAggravate: Boolean = false,
+                           isHyperBloom: Boolean = false, isHyperBloomX2: Boolean = false, isBurgeon: Boolean = false, isBurgeonX2: Boolean = false)
 case class Motion(name: String, `type`: MotionType, element: Element, scalings: Seq[Scaling])
 
 case class Character(name: String, weaponType: WeaponType, element: Element,
@@ -55,7 +57,7 @@ case class Period(startTime: Double, endTime: Double) {
 }
 case class CombatBuff(period: Period, buff: Buff)
 
-case class CombatMotion(time: Double, motion: Motion) {
+case class CombatMotion(time: Double, motion: Motion, modifiers: MotionModifiers) {
   def calcDamage(character: Character, combatBuffs: Seq[CombatBuff]): Double =
     val applyingBuffs = combatBuffs.filter(_.period.contains(time)).map(_.buff)
 
@@ -70,8 +72,8 @@ case class CombatMotion(time: Double, motion: Motion) {
         case Atk => totalAtk
         case Def => totalDef
         case Em => totalEm
-      scalingValue * scaling.values(8)
-    }.sum
+      scalingValue * scaling.values(9) / 100
+    }.sum + modifiers.quill
 
     val elementalDmgBonus = motion.element match
       case Pyro => applyingBuffs.flatMap(_.pyroDmgBonus).sum
@@ -118,8 +120,8 @@ case class CombatMotion(time: Double, motion: Motion) {
       case _ => 0
 
     val cr = character.baseCR + applyingBuffs.flatMap(_.cr).sum
-    val cd = character.baseCR + applyingBuffs.flatMap(_.cd).sum
-    val critMultiplier = 1 + Math.min(100, cr) * cd
+    val cd = character.baseCD + applyingBuffs.flatMap(_.cd).sum
+    val critMultiplier = 1 + Math.min(1, cr/100) * cd/100
 
     (baseMultiplier * scalingTotal * (1+baseIncrease/100) * (1+damageBonus/100) + 0) // additive
       * critMultiplier * (1+elevation/100)
@@ -127,20 +129,51 @@ case class CombatMotion(time: Double, motion: Motion) {
 }
 case class CharacterCombatMotions(character: Character, combatMotions: Seq[CombatMotion])
 
+val emptyMotion = Motion("none", Normal, Physical, Seq(Scaling(Atk, Seq[Double](0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))))
+
 object Formula {
-  @main def main(): Unit =
-    val emptyMotion = Motion("none", Normal, Physical, Seq(Scaling(Atk, Seq[Double](0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))))
-    val motions = Map[String, Motion](
+  def main(): Unit =
+    val neferMotions = Map[String, Motion](
       "shades" -> Motion("shades", LunarBloom, Dendro, Seq(Scaling(Em, Seq[Double](96, 103.2, 110.4, 120, 127.2, 134.4, 144, 153.6, 163.2, 172.8, 182.4, 192, 204, 216, 228))))
     )
-    val nefer = Character("nefer", Catalyst, Dendro, 12704, 344, 799, 100, 5.0, 88.4, motions)
+    val nefer = Character("nefer", Catalyst, Dendro, 12704, 344, 799, 100, 5.0, 88.4, neferMotions)
     val blackMarrow = Weapon("blackMarrowLantern", Catalyst, 454, None, None, None, Some(221), None, None)
 
     val neferRotation = Seq(
-      CombatMotion(1.0, nefer.motions.getOrElse("shades", emptyMotion))
+      CombatMotion(1.0, nefer.motions.getOrElse("shades", emptyMotion), MotionModifiers())
     )
 
     val neferBuffs = Seq(
       CombatBuff(Period(0.0, 2.0), Buff(flatHp = Some(4780), em = Some(56), cd = Some(21.0), cr = Some(3.9), flatAtk = Some(18)))
     )
+}
+
+object FormulaXiao extends App{
+  def main(): Unit =
+    val xiaoMotions = Map[String, Motion](
+      "highPlunge" -> Motion("shades", Plunge, Anemo, Seq(Scaling(Atk, Seq[Double](0, 0, 0, 0, 0, 0, 0, 0, 0, 404, 0, 0, 0, 0, 0))))
+    )
+    val xiao = Character("xiao", Polearm, Anemo, 12704, 859, 799, 0, 100, 237.2, xiaoMotions)
+    val blackcliff = Weapon("blackcliff", Polearm, 454, None, None, None, Some(221), None, None)
+
+    val xiaoRotation = Seq(
+      CombatMotion(1.0, xiao.motions.getOrElse("highPlunge", emptyMotion), MotionModifiers(8000))
+    )
+
+    val xiaoBuffs = Seq(
+      CombatBuff(Period(0.0, 2.0), Buff(flatAtk = Some(311), atkPct = Some(46.6), anemoDmgBonus = Some(46.6))),
+      CombatBuff(Period(0.0, 2.0), Buff(flatAtk = Some(79), atkPct = Some(17.5))),
+      CombatBuff(Period(0.0, 2.0), Buff(atkPct = Some(40))),
+      CombatBuff(Period(0.0, 2.0), Buff(plungeDmgBonus = Some(95.2))),
+      CombatBuff(Period(0.0, 2.0), Buff(plungeDmgBonus = Some(50))),
+      CombatBuff(Period(0.0, 2.0), Buff(plungeDmgBonus = Some(5))),
+      CombatBuff(Period(0.0, 2.0), Buff(anemoDmgBonus = Some(38.3))),
+      CombatBuff(Period(0.0, 2.0), Buff(cd = Some(40))),
+    )
+
+    val baseDamage = xiaoRotation.map(_.calcDamage(xiao, xiaoBuffs)).sum
+
+    println(baseDamage * 0.487179487179 * 1.1)
+
+  main()
 }
