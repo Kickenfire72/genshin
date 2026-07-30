@@ -27,16 +27,25 @@ def getEmMultiplier(reaction: Reaction, em: Int): Double =
     case Aggravate | Spread => 5 * em / (em + 1200)
     case LunarEC | LunarBloom | LunarCR | StellarSC | StellarSW => 6 * em / (em + 2000)
 
+def getResMultiplier(res: Double): Double = {
+  if res < 0 then 1-res/2
+  else if res < 0.75 then 1-res
+  else 1 / (4*res+1)
+}
 
 case class Scaling(`type`: ScalingType, values: Seq[Double])
 case class MotionModifiers(quill: Int = 0, isMelt: Boolean = false, isVape: Boolean = false, isSpread: Boolean = false, isAggravate: Boolean = false,
                            isHyperBloom: Boolean = false, isHyperBloomX2: Boolean = false, isBurgeon: Boolean = false, isBurgeonX2: Boolean = false)
 case class Motion(name: String, `type`: MotionType, element: Element, scalings: Seq[Scaling])
 
-case class Character(name: String, weaponType: WeaponType, element: Element,
+case class Character(name: String, level: Int, weaponType: WeaponType, element: Element,
                      baseHP: Int, baseATK: Int, baseDEF: Int,
                      baseEM: Int, baseCR: Double, baseCD: Double,
                      motions: Map[String, Motion])
+
+case class Target(level: Int, res: Double)
+
+val target = Target(105, 10)
 
 case class Weapon(name: String, weaponType: WeaponType, baseATK: Int,
                   hpPct: Option[Double], atkPct: Option[Double], defPct: Option[Double],
@@ -50,7 +59,9 @@ case class Buff(flatHp: Option[Int] = None, flatAtk: Option[Int] = None, flatDef
                 lunarECDmgBonus: Option[Double] = None, lunarBloomDmgBonus: Option[Double] = None, lunarCRDmgBonus: Option[Double] = None, stellarSCDmgBonus: Option[Double] = None, stellarSWDmgBonus: Option[Double] = None,
                 lunarECBaseIncrease: Option[Int] = None, lunarBloomBaseIncrease: Option[Int] = None, lunarCRBaseIncrease: Option[Int] = None, stellarSCBaseIncrease: Option[Int] = None, stellarSWBaseIncrease: Option[Int] = None,
                 stellarSCStacks: Option[Int] = None, stellarSWLevel: Option[Int] = None,
-                lunarECElevation: Option[Double] = None, lunarBloomElevation: Option[Double] = None, lunarCRElevation: Option[Double] = None, stellarSCElevation: Option[Double] = None, stellarSWElevation: Option[Double] = None)
+                lunarECElevation: Option[Double] = None, lunarBloomElevation: Option[Double] = None, lunarCRElevation: Option[Double] = None, stellarSCElevation: Option[Double] = None, stellarSWElevation: Option[Double] = None,
+                pyroResShred: Option[Double] = None, hydroResShred: Option[Double] = None, electroResShred: Option[Double] = None, cryoResShred: Option[Double] = None, anemoResShred: Option[Double] = None, geoResShred: Option[Double] = None, dendroResShred: Option[Double] = None, physicalResShred: Option[Double] = None,
+                defShred: Option[Double] = None)
 
 case class Period(startTime: Double, endTime: Double) {
   def contains(time: Double): Boolean = (startTime <= time) && (endTime >= time)
@@ -123,8 +134,25 @@ case class CombatMotion(time: Double, motion: Motion, modifiers: MotionModifiers
     val cd = character.baseCD + applyingBuffs.flatMap(_.cd).sum
     val critMultiplier = 1 + Math.min(1, cr/100) * cd/100
 
+    val resShred = motion.element match
+      case Pyro => applyingBuffs.flatMap(_.pyroResShred).sum
+      case Hydro => applyingBuffs.flatMap(_.hydroResShred).sum
+      case Electro => applyingBuffs.flatMap(_.electroResShred).sum
+      case Cryo => applyingBuffs.flatMap(_.cryoResShred).sum
+      case Anemo => applyingBuffs.flatMap(_.anemoResShred).sum
+      case Geo => applyingBuffs.flatMap(_.geoResShred).sum
+      case Dendro => applyingBuffs.flatMap(_.dendroResShred).sum
+      case Physical => applyingBuffs.flatMap(_.physicalResShred).sum
+    val res = target.res - resShred
+    val resMultiplier = getResMultiplier(res/100)
+    
+    val defShred = applyingBuffs.flatMap(_.defShred).sum
+    val levelMultiplier: Double = (character.level.toDouble + 100)/(character.level + target.level + 200)
+    val defMultiplier: Double = levelMultiplier / (1 - defShred/100)
+
+    // TODO: additive damage
     (baseMultiplier * scalingTotal * (1+baseIncrease/100) * (1+damageBonus/100) + 0) // additive
-      * critMultiplier * (1+elevation/100)
+      * critMultiplier * (1+elevation/100) * resMultiplier * defMultiplier
 
 }
 case class CharacterCombatMotions(character: Character, combatMotions: Seq[CombatMotion])
@@ -136,7 +164,7 @@ object Formula {
     val neferMotions = Map[String, Motion](
       "shades" -> Motion("shades", LunarBloom, Dendro, Seq(Scaling(Em, Seq[Double](96, 103.2, 110.4, 120, 127.2, 134.4, 144, 153.6, 163.2, 172.8, 182.4, 192, 204, 216, 228))))
     )
-    val nefer = Character("nefer", Catalyst, Dendro, 12704, 344, 799, 100, 5.0, 88.4, neferMotions)
+    val nefer = Character("nefer", 90, Catalyst, Dendro, 12704, 344, 799, 100, 5.0, 88.4, neferMotions)
     val blackMarrow = Weapon("blackMarrowLantern", Catalyst, 454, None, None, None, Some(221), None, None)
 
     val neferRotation = Seq(
@@ -153,7 +181,7 @@ object FormulaXiao extends App{
     val xiaoMotions = Map[String, Motion](
       "highPlunge" -> Motion("shades", Plunge, Anemo, Seq(Scaling(Atk, Seq[Double](0, 0, 0, 0, 0, 0, 0, 0, 0, 404, 0, 0, 0, 0, 0))))
     )
-    val xiao = Character("xiao", Polearm, Anemo, 12704, 859, 799, 0, 100, 237.2, xiaoMotions)
+    val xiao = Character("xiao", 90, Polearm, Anemo, 12704, 859, 799, 0, 100, 237.2, xiaoMotions)
     val blackcliff = Weapon("blackcliff", Polearm, 454, None, None, None, Some(221), None, None)
 
     val xiaoRotation = Seq(
@@ -169,11 +197,14 @@ object FormulaXiao extends App{
       CombatBuff(Period(0.0, 2.0), Buff(plungeDmgBonus = Some(5))),
       CombatBuff(Period(0.0, 2.0), Buff(anemoDmgBonus = Some(38.3))),
       CombatBuff(Period(0.0, 2.0), Buff(cd = Some(40))),
+      CombatBuff(Period(0.0, 2.0), Buff(anemoResShred = Some(30))),
+
+      CombatBuff(Period(2.0, 3.0), Buff(cd = Some(400))),
     )
 
     val baseDamage = xiaoRotation.map(_.calcDamage(xiao, xiaoBuffs)).sum
 
-    println(baseDamage * 0.487179487179 * 1.1)
+    println(baseDamage)
 
   main()
 }
